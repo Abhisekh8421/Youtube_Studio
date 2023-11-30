@@ -26,18 +26,18 @@ Welcome to the YouTube Studio project, a robust web application built using the 
 1. Clone the repository.
 
    ```bash
-   git clone https://github.com/Abhisekh8421/Youtube_Studio.git
+   git clone
+   https://github.com/Abhisekh8421/Youtube_Studio.git
    ```
 
 2. Install dependencies for both the client and server.
 
    ```bash
-   cd youtube-studio
    npm install
-
    ```
 
 3. Set up your environment variables. Create a `.env` file in the server directory and add your MongoDB connection string, Cloudinary credentials, and JWT secret.
+
    ```env
    MONGO_URI=your_mongodb_connection_string
    CLOUDINARY_API_KEY=your_cloudinary_api_key
@@ -47,14 +47,16 @@ Welcome to the YouTube Studio project, a robust web application built using the 
    ACCESS_TOKEN_EXPIRY=your_access_expiry
    REFRESH_TOKEN_SECRET=your_refresh_token
    REFRESH_TOKEN_EXPIRY=your_refresh_expiry
+
    ```
 
-````
-
 4. Run the development server.
-```bash
-npm run dev
 
+   ```bash
+
+   npm  run dev
+
+   ```
 
 5. Open your browser and navigate to `http://localhost:3000` to explore the YouTube Studio!
 
@@ -67,4 +69,3 @@ Contributions are welcome! Feel free to open issues or pull requests to improve 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 Enjoy creating and sharing amazing content with YouTube Studio! 🚀🎬
-````
