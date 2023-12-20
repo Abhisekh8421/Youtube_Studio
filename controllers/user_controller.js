@@ -4,6 +4,20 @@ import { User } from "../models/user_model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponce } from "../utils/ApiResponce.js";
 
+const generateaccesstokenAndrefreshtoken = async (userid) => {
+  try {
+    const user = User.findById({ userid });
+    const accessToken = user.generateaccesstoken();
+    const refreshToken = user.generaterefreshtoken();
+    user.refreshToken = refreshToken;
+    await user.save({ validateBeforeSave: false });
+
+    return { accessToken, refreshToken };
+  } catch (error) {
+    throw new ApiError(500, "something went wrong in the tokens");
+  }
+};
+
 export const RegisterUser = asyncHandler(async (req, res) => {
   //steps defined by {Abhisekhsuru-Creator}
   //get the details from the user
@@ -85,4 +99,53 @@ export const RegisterUser = asyncHandler(async (req, res) => {
   return res
     .status(201)
     .json(new ApiResponce(201, createdUser, "User Registered Successfully"));
+});
+
+export const loginUser = asyncHandler(async (req, res) => {
+  const { email, username, password } = req.body;
+  if (!email) {
+    throw new ApiError(400, "email is required so please enter ");
+  }
+
+  const user = await User.findOne({
+    $or: [{ username }, { email }],
+  });
+
+  if (!user) {
+    throw new ApiError(404, "user doesnot exist");
+  }
+
+  const isPasswordValid = await user.isPasswordcorrect(password);
+
+  if (!isPasswordValid) {
+    throw new ApiError(401, "invalid user credentials");
+  }
+
+  const { accessToken, refreshToken } =
+    await generateaccesstokenAndrefreshtoken(user._id);
+
+  const loggedUser = await User.findById(user._id).select(
+    "-password -refreshToken"
+  );
+
+  const options = {
+    httpOnly: true,
+    secure: true,
+  };
+
+  return res
+    .status(200)
+    .cookie("accessToken", accessToken, options)
+    .cookie("refreshToken", refreshToken, options)
+    .json(
+      new ApiResponce(
+        200,
+        {
+          user: loggedUser,
+          accessToken,
+          refreshToken,
+        },
+        "user logged in successfully"
+      )
+    );
 });
