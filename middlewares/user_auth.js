@@ -14,10 +14,10 @@ export const isAuthenticated = asyncHandler(async (req, _, next) => {
       throw new ApiError(401, "Unauthorized request");
     }
 
-    const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET); //it will give you the basic user credientials 
 
     const user = await User.findById(decodedToken?._id).select(
-      "-password -refreshToken"
+      "-password -refreshToken"  // when we retrieve the user document it comes without password and refresh token
     );
 
     if (!user) {
@@ -26,7 +26,7 @@ export const isAuthenticated = asyncHandler(async (req, _, next) => {
 
     req.user = user;
 
-    next();
+    next(); // sent the req.user data to next controller
   } catch (error) {
     throw new ApiError(401, error?.message || "Invalid User Token");
   }
