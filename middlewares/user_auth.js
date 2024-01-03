@@ -1,6 +1,6 @@
-import { User } from "../models/user_model";
-import { ApiError } from "../utils/ApiError";
-import { asyncHandler } from "../utils/asyncHandler";
+import { User } from "../models/user_model.js";
+import { ApiError } from "../utils/ApiError.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 
 import jwt from "jsonwebtoken";
 
@@ -14,10 +14,10 @@ export const isAuthenticated = asyncHandler(async (req, _, next) => {
       throw new ApiError(401, "Unauthorized request");
     }
 
-    const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET); //it will give you the basic user credientials 
+    const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET); //it will give you the basic user credientials
 
     const user = await User.findById(decodedToken?._id).select(
-      "-password -refreshToken"  // when we retrieve the user document it comes without password and refresh token
+      "-password -refreshToken" // when we retrieve the user document it comes without password and refresh token
     );
 
     if (!user) {

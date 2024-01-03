@@ -6,7 +6,7 @@ import { ApiResponce } from "../utils/ApiResponce.js";
 
 const generateaccesstokenAndrefreshtoken = async (userid) => {
   try {
-    const user = User.findById(userid);
+    const user = await User.findById(userid);
     if (!user) {
       throw new ApiError(404, "User Does Not Exist");
     }
@@ -17,6 +17,7 @@ const generateaccesstokenAndrefreshtoken = async (userid) => {
 
     return { accessToken, refreshToken };
   } catch (error) {
+    console.log("errro", error.message);
     throw new ApiError(500, "something went wrong in the tokens");
   }
 };
@@ -52,7 +53,7 @@ export const RegisterUser = asyncHandler(async (req, res) => {
     // throw new ApiError(400, "User already Existed ");
   }
 
-  const avatarlocalpath = req.files?.avatar[0]?.path;
+  const avatarlocalpath = req.files?.avatar?.[0]?.path;
 
   // const coverImagelocalpath = req.files?.coverImage[0]?.path;
   let coverImageLocalPath;
@@ -67,6 +68,7 @@ export const RegisterUser = asyncHandler(async (req, res) => {
   console.log("avatar local path:", avatarlocalpath);
 
   if (!avatarlocalpath) {
+    // console.error("req.files structure:", req.files);
     throw new ApiError(400, "Avatar local path is required");
   }
   // Upload avatar to Cloudinary
