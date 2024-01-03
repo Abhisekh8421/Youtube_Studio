@@ -6,7 +6,10 @@ import { ApiResponce } from "../utils/ApiResponce.js";
 
 const generateaccesstokenAndrefreshtoken = async (userid) => {
   try {
-    const user = User.findById({ userid });
+    const user = User.findById(userid);
+    if (!user) {
+      throw new ApiError(404, "User Does Not Exist");
+    }
     const accessToken = user.generateaccesstoken();
     const refreshToken = user.generaterefreshtoken();
     user.refreshToken = refreshToken;
