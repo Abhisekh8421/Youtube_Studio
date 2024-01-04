@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  ChangeCurrentPassword,
   RegisterUser,
   loginUser,
   logoutUser,
@@ -28,5 +29,7 @@ router.route("/login").post(loginUser);
 router.route("/logout").get(isAuthenticated, logoutUser);
 
 router.route("/refresh-token").post(RefreshAccessToken);
+
+router.route("/passwordchange").post(ChangeCurrentPassword);
 
 export default router;

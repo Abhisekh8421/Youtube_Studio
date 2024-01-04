@@ -231,3 +231,22 @@ export const RefreshAccessToken = asyncHandler(async (req, res) => {
     throw new ApiError(401, error?.message || "something went wrong");
   }
 });
+
+export const ChangeCurrentPassword = asyncHandler(async (req, res) => {
+  const { oldpassword, newpassword, confirmpassword } = req.body;
+  if (!(newpassword === confirmpassword)) {
+    throw new ApiError(401, "password is incorrect");
+  }
+  const user = await User.findById(req.user._id);
+
+  const passwordcheck = await user.isPasswordcorrect(oldpassword);
+  if (!passwordcheck) {
+    throw new ApiError(401, "invalid User Old Password");
+  }
+  user.password = newpassword;
+  await user.save({ validateBeforeSave: false });
+
+  return res
+    .status(200)
+    .json(new ApiResponce(200, {}, "Successfully Password Changed"));
+});
