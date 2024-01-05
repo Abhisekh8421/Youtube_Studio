@@ -30,6 +30,6 @@ router.route("/logout").get(isAuthenticated, logoutUser);
 
 router.route("/refresh-token").post(RefreshAccessToken);
 
-router.route("/passwordchange").post(ChangeCurrentPassword);
+router.route("/passwordchange").post(isAuthenticated, ChangeCurrentPassword);
 
 export default router;

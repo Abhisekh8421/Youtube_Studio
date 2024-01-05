@@ -250,3 +250,84 @@ export const ChangeCurrentPassword = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponce(200, {}, "Successfully Password Changed"));
 });
+
+export const getCurrentUser = asyncHandler(async (req, res) => {
+  return res
+    .status(200)
+    .json(new ApiResponce(200, req.user, "successfully user feteched"));
+});
+
+export const updateAccountDetails = asyncHandler(async (req, res) => {
+  const { fullname, email } = req.body;
+  if (!fullname || !email) {
+    throw new ApiError(401, "All fields are required");
+  }
+  const user = await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      $set: {
+        fullname,
+        email,
+      },
+    },
+    {
+      new: true,
+    }
+  ).select("-password");
+
+  return res
+    .status(200)
+    .json(new ApiResponce(200, user, "successfully updated user details"));
+});
+
+export const updateUserAvatar = asyncHandler(async (req, res) => {
+  const userAvatar = req.file?.path;
+  if (!userAvatar) {
+    throw new ApiError(400, "avatar file missing");
+  }
+  const avatar = await uploadOnCloudinary(userAvatar);
+  if (!avatar.url) {
+    throw new ApiError(400, "Error uploading avatar to Cloudinary");
+  }
+  const user = await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      $set: {
+        avatar: avatar.url,
+      },
+    },
+    {
+      new: true,
+    }
+  ).select("-password");
+
+  return res
+    .status(200)
+    .json(new ApiResponce(200, user, "successfully updated userAvatar"));
+});
+
+export const updateUserCoverImage = asyncHandler(async (req, res) => {
+  const userCoverImage = req.file?.path;
+  if (!userCoverImage) {
+    throw new ApiError(400, "coverImage file missing");
+  }
+  const coverImage = await uploadOnCloudinary(userCoverImage);
+  if (!coverImage.url) {
+    throw new ApiError(400, "Error uploading coverImage to Cloudinary");
+  }
+  const user = await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      $set: {
+        coverImage: coverImage.url,
+      },
+    },
+    {
+      new: true,
+    }
+  );
+
+  return res
+    .status(200)
+    .json(new ApiResponce(200, user, "successfully updated userCoverImage "));
+});
