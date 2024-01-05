@@ -2,8 +2,12 @@ import express from "express";
 import {
   ChangeCurrentPassword,
   RegisterUser,
+  getCurrentUser,
   loginUser,
   logoutUser,
+  updateAccountDetails,
+  updateUserAvatar,
+  updateUserCoverImage,
 } from "../controllers/user_controller.js";
 import { upload } from "../middlewares/multer_middleware.js";
 import { isAuthenticated } from "../middlewares/user_auth.js";
@@ -31,5 +35,17 @@ router.route("/logout").get(isAuthenticated, logoutUser);
 router.route("/refresh-token").post(RefreshAccessToken);
 
 router.route("/passwordchange").post(isAuthenticated, ChangeCurrentPassword);
+
+router.route("/currentUser").get(isAuthenticated, getCurrentUser);
+
+router.route("/update-account").post(isAuthenticated, updateAccountDetails);
+
+router
+  .route("/avatar")
+  .post(isAuthenticated, upload.single(" avatar"), updateUserAvatar);
+
+router
+  .route("/Coverimage")
+  .post(isAuthenticated, upload.single("coverImage"), updateUserCoverImage);
 
 export default router;
