@@ -205,7 +205,7 @@ export const RefreshAccessToken = asyncHandler(async (req, res) => {
     }
 
     const { accessToken, newRefreshToken } =
-      await generateAccessandRefreshToken(user._id);
+      await generateaccesstokenAndrefreshtoken(user._id);
 
     const options = {
       httpOnly: true,
