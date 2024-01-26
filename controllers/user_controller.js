@@ -331,3 +331,33 @@ export const updateUserCoverImage = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponce(200, user, "successfully updated userCoverImage "));
 });
+
+export const getUserChannelprofile = asyncHandler(async (req, res) => {
+  const { username } = req.params;
+  if (!username?.trim()) {
+    throw new ApiError(400, "Username is missing");
+  }
+  await User.aggregate([
+    {
+      $match: {
+        username: username?.tolowercase(),
+      },
+    },
+    {
+      $lookup: {
+        from: "subscriptions",
+        localField: "_id",
+        foreignField: "channel",
+        as: "subscribers",
+      },
+    },
+    {
+      $lookup: {
+        from: "subscriptions",
+        localField: "_id",
+        foreignField: "Subscriber",
+        as: "subscribeTo",
+      },
+    },
+  ]);
+});
