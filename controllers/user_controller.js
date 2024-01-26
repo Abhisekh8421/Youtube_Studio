@@ -403,4 +403,15 @@ export const getUserChannelprofile = asyncHandler(async (req, res) => {
   if (!channel) {
     throw new ApiError(404, "Channel is notfound");
   }
+  return res
+    .status(200)
+    .json(
+      new ApiResponce(
+        200,
+        channel[0],
+        "Successfully Fetched your Channel Profile"
+      )
+    );
+
+  //because aggregate pipeline returns the array so we need to send the starting location data that will be our actual required data
 });
