@@ -3,6 +3,7 @@ import {
   ChangeCurrentPassword,
   RegisterUser,
   getCurrentUser,
+  getUserChannelprofile,
   loginUser,
   logoutUser,
   updateAccountDetails,
@@ -47,5 +48,7 @@ router
 router
   .route("/Coverimage")
   .post(isAuthenticated, upload.single("coverImage"), updateUserCoverImage);
+
+router.get("/getuserchannelprofile", getUserChannelprofile);
 
 export default router;
