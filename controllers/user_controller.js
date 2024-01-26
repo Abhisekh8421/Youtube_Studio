@@ -281,6 +281,12 @@ export const updateAccountDetails = asyncHandler(async (req, res) => {
 });
 
 export const updateUserAvatar = asyncHandler(async (req, res) => {
+
+  //retrieve the user avatar from database 
+  const currentUser = await User.findById(req.user._id);
+  //store the previous avatar image into one variable
+  const previousAvatarUrl = currentUser.avatar;
+
   const userAvatar = req.file?.path;
   if (!userAvatar) {
     throw new ApiError(400, "avatar file missing");
@@ -288,6 +294,14 @@ export const updateUserAvatar = asyncHandler(async (req, res) => {
   const avatar = await uploadOnCloudinary(userAvatar);
   if (!avatar.url) {
     throw new ApiError(400, "Error uploading avatar to Cloudinary");
+  }
+
+
+  //delete the previous avatar image from cloudinary
+  if(previousAvatarUrl)
+  {
+    const publicId = getPublicIdFromUrl(previousAvatarUrl);
+    await deleteFromCloudinary(publicId);
   }
   const user = await User.findByIdAndUpdate(
     req.user._id,
