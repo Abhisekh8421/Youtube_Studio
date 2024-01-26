@@ -281,8 +281,7 @@ export const updateAccountDetails = asyncHandler(async (req, res) => {
 });
 
 export const updateUserAvatar = asyncHandler(async (req, res) => {
-
-  //retrieve the user avatar from database 
+  //retrieve the user avatar from database
   const currentUser = await User.findById(req.user._id);
   //store the previous avatar image into one variable
   const previousAvatarUrl = currentUser.avatar;
@@ -296,10 +295,8 @@ export const updateUserAvatar = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Error uploading avatar to Cloudinary");
   }
 
-
   //delete the previous avatar image from cloudinary
-  if(previousAvatarUrl)
-  {
+  if (previousAvatarUrl) {
     const publicId = getPublicIdFromUrl(previousAvatarUrl);
     await deleteFromCloudinary(publicId);
   }
@@ -351,7 +348,7 @@ export const getUserChannelprofile = asyncHandler(async (req, res) => {
   if (!username?.trim()) {
     throw new ApiError(400, "Username is missing");
   }
-  await User.aggregate([
+  const channel = await User.aggregate([
     {
       $match: {
         username: username?.tolowercase(),
@@ -373,5 +370,37 @@ export const getUserChannelprofile = asyncHandler(async (req, res) => {
         as: "subscribeTo",
       },
     },
+    {
+      $addFields: {
+        subscribersCount: {
+          $size: "$subscribers",
+        },
+        channelSubscribedTocount: {
+          $size: "$subscribeTo",
+        },
+        isSubscribed: {
+          $cond: {
+            if: { $in: [req.user?._id, "$subscribers.subscriber"] },
+            then: true,
+            else: false,
+          },
+        },
+      },
+    },
+    {
+      $project: {
+        fullName: 1,
+        username: 1,
+        subscribersCount: 1,
+        channelSubscribedTocount: 1,
+        isSubscribed: 1,
+        avatar: 1,
+        coverImage: 1,
+        email: 1,
+      },
+    },
   ]);
+  if (!channel) {
+    throw new ApiError(404, "Channel is notfound");
+  }
 });
