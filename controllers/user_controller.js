@@ -3,6 +3,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { User } from "../models/user_model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponce } from "../utils/ApiResponce.js";
+import mongoose from "mongoose";
 
 const generateaccesstokenAndrefreshtoken = async (userid) => {
   try {
@@ -34,10 +35,10 @@ export const RegisterUser = asyncHandler(async (req, res) => {
   //check for user creation
   //return res
 
-  const { username, email, fullName, password } = req.body;
+  const { username, email, fullname, password } = req.body;
   // console.log("email:", email); for check is it working or not
   if (
-    [username, email, fullName, password].some((field) => field?.trim() === "")
+    [username, email, fullname, password].some((field) => field?.trim() === "")
   ) {
     throw new ApiError(400, "All Fields are required");
   }
@@ -91,7 +92,7 @@ export const RegisterUser = asyncHandler(async (req, res) => {
     coverImage: coverImage?.url || "",
     email,
     password,
-    fullName,
+    fullname,
   });
 
   const createdUser = await User.findById(user._id).select(
@@ -389,7 +390,7 @@ export const getUserChannelprofile = asyncHandler(async (req, res) => {
     },
     {
       $project: {
-        fullName: 1,
+        fullname: 1,
         username: 1,
         subscribersCount: 1,
         channelSubscribedTocount: 1,
@@ -403,15 +404,69 @@ export const getUserChannelprofile = asyncHandler(async (req, res) => {
   if (!channel) {
     throw new ApiError(404, "Channel is notfound");
   }
+  return res.status(200).json(
+    new ApiResponce(
+      200,
+      channel[0], //for aggregation it returns the array so we have to take the first element
+      "Successfully Fetched your Channel Profile"
+    )
+  );
+
+  //because aggregate pipeline returns the array so we need to send the starting location data that will be our actual required data
+});
+
+export const getWatchHistory = asyncHandler(async (req, res) => {
+  const user = await User.aggregate([
+    {
+      $match: {
+        _id: new mongoose.Types.ObjectId(req.user._id),
+      },
+    },
+    {
+      $lookup: {
+        from: "videos",
+        localField: "watchHistory",
+        foreignField: "_id",
+        as: "Watchhistory",
+        pipeline: [
+          {
+            // Sub-pipeline for looking up owner details
+            $lookup: {
+              from: "users",
+              localField: "owner",
+              foreignField: "_id",
+              as: "owner",
+              pipeline: [
+                {
+                  $project: {
+                    username: 1,
+                    fullname: 1,
+                    avatar: 1,
+                  },
+                },
+              ],
+            },
+          },
+          {
+            // Adding the owner details to the video document
+            $addFields: {
+              owner: {
+                $first: "$owner",
+              },
+            },
+          },
+        ],
+      },
+    },
+  ]);
+
   return res
     .status(200)
     .json(
       new ApiResponce(
         200,
-        channel[0],
-        "Successfully Fetched your Channel Profile"
+        user[0].watchHistory,
+        "Successfully fetched Your Watch History"
       )
     );
-
-  //because aggregate pipeline returns the array so we need to send the starting location data that will be our actual required data
 });

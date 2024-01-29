@@ -4,6 +4,7 @@ import {
   RegisterUser,
   getCurrentUser,
   getUserChannelprofile,
+  getWatchHistory,
   loginUser,
   logoutUser,
   updateAccountDetails,
@@ -50,5 +51,6 @@ router
   .post(isAuthenticated, upload.single("coverImage"), updateUserCoverImage);
 
 router.get("/getuserchannelprofile", getUserChannelprofile);
+router.get("/getwatchistory", isAuthenticated, getWatchHistory);
 
 export default router;
