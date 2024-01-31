@@ -40,17 +40,17 @@ router.route("/passwordchange").post(isAuthenticated, ChangeCurrentPassword);
 
 router.route("/currentUser").get(isAuthenticated, getCurrentUser);
 
-router.route("/update-account").post(isAuthenticated, updateAccountDetails);
+router.route("/update-account").patch(isAuthenticated, updateAccountDetails);
 
 router
   .route("/avatar")
-  .post(isAuthenticated, upload.single(" avatar"), updateUserAvatar);
+  .patch(isAuthenticated, upload.single(" avatar"), updateUserAvatar);
 
 router
   .route("/Coverimage")
-  .post(isAuthenticated, upload.single("coverImage"), updateUserCoverImage);
+  .patch(isAuthenticated, upload.single("coverImage"), updateUserCoverImage);
 
-router.get("/getuserchannelprofile", getUserChannelprofile);
+router.get("/c/:username", getUserChannelprofile);
 router.get("/getwatchistory", isAuthenticated, getWatchHistory);
 
 export default router;
